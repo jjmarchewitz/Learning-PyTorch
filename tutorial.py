@@ -113,7 +113,7 @@ with open("out.txt", "w") as f:
         optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 
         # Run model for 25 epochs
-        epochs = 25
+        epochs = 3
         for t in range(epochs):
             # print(f"Epoch {t+1}\n-------------------------------")
             train(train_dataloader, model, loss_fn, optimizer)
