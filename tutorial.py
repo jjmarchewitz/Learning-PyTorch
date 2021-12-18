@@ -60,9 +60,10 @@ def test(dataloader, model, loss_fn):
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
     test_loss /= num_batches
     correct /= size
-    print(
-        f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n"
-    )
+    # print(
+    #     f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n"
+    # )
+    return correct, test_loss
 
 
 # Download training data from open datasets.
@@ -80,12 +81,12 @@ test_data = datasets.FashionMNIST(
     download=True,
     transform=ToTensor(),
 )
-with open("out.txt") as f:
-    for batch_size in range(50, 200, 50):
+with open("out.txt", "w") as f:
+    for batch_size in range(50, 250, 50):
 
         # Output batch size
-        print(f"Batch Size: {batch_size}")
-        f.write(f"Batch Size: {batch_size}")
+        print(f"Batch Size: {batch_size}\n")
+        f.write(f"Batch Size: {batch_size}\n")
 
         train_dataloader = DataLoader(training_data, batch_size=batch_size)
         # Create data loaders.
@@ -110,7 +111,12 @@ with open("out.txt") as f:
         for t in range(epochs):
             # print(f"Epoch {t+1}\n-------------------------------")
             train(train_dataloader, model, loss_fn, optimizer)
-            test(test_dataloader, model, loss_fn)
+            correct, test_loss = test(test_dataloader, model, loss_fn)
+
+            if t == epochs - 1:
+                print_str = f"Test Error - [Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}]\n"
+                print(print_str)
+                f.write(print_str)
 
 
 print("Done!")
