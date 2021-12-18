@@ -1,2 +1,1 @@
-Batch Size: 50
-Test Error [Accuracy: 62.5%, Avg loss: 1.303954]
+Batch Size: 10
