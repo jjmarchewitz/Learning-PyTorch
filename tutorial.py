@@ -80,36 +80,37 @@ test_data = datasets.FashionMNIST(
     download=True,
     transform=ToTensor(),
 )
+with open("out.txt") as f:
+    for batch_size in range(50, 200, 50):
 
-for batch_size in range(50, 200, 50):
+        # Output batch size
+        print(f"Batch Size: {batch_size}")
+        f.write(f"Batch Size: {batch_size}")
 
-    # Output batch size
-    print(f"Batch Size: {batch_size}")
+        train_dataloader = DataLoader(training_data, batch_size=batch_size)
+        # Create data loaders.
+        test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
-    # Create data loaders.
-    train_dataloader = DataLoader(training_data, batch_size=batch_size)
-    test_dataloader = DataLoader(test_data, batch_size=batch_size)
+        # Display info about the shape of the data loaders
+        # for X, y in test_dataloader:
+        #     print("Shape of X [N, C, H, W]: ", X.shape)
+        #     print("Shape of y: ", y.shape, y.dtype)
+        #     break
 
-    # Display info about the shape of the data loaders
-    # for X, y in test_dataloader:
-    #     print("Shape of X [N, C, H, W]: ", X.shape)
-    #     print("Shape of y: ", y.shape, y.dtype)
-    #     break
+        # Print model
+        model = NeuralNetwork().to(device)
+        # print(model)
 
-    # Print model
-    model = NeuralNetwork().to(device)
-    # print(model)
+        # Define loss function and optimizer
+        loss_fn = nn.CrossEntropyLoss()
+        optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 
-    # Define loss function and optimizer
-    loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
-
-    # Run model for 25 epochs
-    epochs = 25
-    for t in range(epochs):
-        # print(f"Epoch {t+1}\n-------------------------------")
-        train(train_dataloader, model, loss_fn, optimizer)
-        test(test_dataloader, model, loss_fn)
+        # Run model for 25 epochs
+        epochs = 25
+        for t in range(epochs):
+            # print(f"Epoch {t+1}\n-------------------------------")
+            train(train_dataloader, model, loss_fn, optimizer)
+            test(test_dataloader, model, loss_fn)
 
 
 print("Done!")
