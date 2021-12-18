@@ -123,7 +123,7 @@ with open("out.txt", "w") as f:
                 print(print_str)
                 f.write(print_str)
 
-        time_str = f"Time taken: {time.time() - start_time} "
+        time_str = f"Time taken: {time.time() - start_time} \n"
         print(time_str)
         f.write(time_str)
 
