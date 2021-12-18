@@ -15,12 +15,13 @@ class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
         self.flatten = nn.Flatten()
+        internal_layer_size = 2048
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(28 * 28, 512),
+            nn.Linear(28 * 28, internal_layer_size),
             nn.ReLU(),
-            nn.Linear(512, 512),
+            nn.Linear(internal_layer_size, internal_layer_size),
             nn.ReLU(),
-            nn.Linear(512, 10),
+            nn.Linear(internal_layer_size, 10),
         )
 
     def forward(self, x):
