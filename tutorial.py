@@ -1,9 +1,11 @@
+import matplotlib.pyplot as plt
+import time
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda, Compose
-import matplotlib.pyplot as plt
+
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -82,6 +84,9 @@ test_data = datasets.FashionMNIST(
     transform=ToTensor(),
 )
 with open("out.txt", "w") as f:
+
+    start_time = time.time()
+
     for batch_size in range(50, 250, 50):
 
         # Output batch size
@@ -117,6 +122,10 @@ with open("out.txt", "w") as f:
                 print_str = f"Test Error - [Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}]\n"
                 print(print_str)
                 f.write(print_str)
+
+        time_str = f"Time taken: {time.time() - start_time}"
+        print(time_str)
+        f.write(time_str)
 
 
 print("Done!")
