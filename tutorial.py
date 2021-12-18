@@ -90,8 +90,8 @@ with open("out.txt", "w") as f:
     for batch_size in range(10, 50):
 
         # Output batch size
-        print(f"Batch Size: {batch_size}\n")
-        f.write(f"Batch Size: {batch_size}\n")
+        print(f"Batch Size: {batch_size} ")
+        f.write(f"Batch Size: {batch_size}")
 
         train_dataloader = DataLoader(training_data, batch_size=batch_size)
         # Create data loaders.
@@ -119,11 +119,11 @@ with open("out.txt", "w") as f:
             correct, test_loss = test(test_dataloader, model, loss_fn)
 
             if t == epochs - 1:
-                print_str = f"Test Error - [Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}]\n"
+                print_str = f"Test Error - [Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}] "
                 print(print_str)
                 f.write(print_str)
 
-        time_str = f"Time taken: {time.time() - start_time}"
+        time_str = f"Time taken: {time.time() - start_time} "
         print(time_str)
         f.write(time_str)
 
