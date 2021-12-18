@@ -15,7 +15,7 @@ class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
         self.flatten = nn.Flatten()
-        internal_layer_size = 2048
+        internal_layer_size = 1024
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(28 * 28, internal_layer_size),
             nn.ReLU(),
@@ -86,9 +86,9 @@ test_data = datasets.FashionMNIST(
 )
 with open("out.txt", "w") as f:
 
-    start_time = time.time()
-
     for batch_size in range(2, 10):
+
+        start_time = time.time()
 
         # Output batch size
         print(f"Batch Size: {batch_size} ")
