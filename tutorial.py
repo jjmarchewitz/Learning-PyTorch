@@ -87,7 +87,7 @@ with open("out.txt", "w") as f:
 
     start_time = time.time()
 
-    for batch_size in range(50, 250, 50):
+    for batch_size in range(50, 1000, 50):
 
         # Output batch size
         print(f"Batch Size: {batch_size}\n")
