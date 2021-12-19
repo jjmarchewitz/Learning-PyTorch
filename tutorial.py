@@ -14,7 +14,7 @@ class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
         self.flatten = nn.Flatten()
-        internal_layer_size = 1024
+        internal_layer_size = 4096
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(28 * 28, internal_layer_size),
             nn.ReLU(),
@@ -31,7 +31,8 @@ class NeuralNetwork(nn.Module):
 
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
-    model.cuda()
+    if torch.cuda.is_available():
+        model = model.cuda()
     gap_time = time.time()
 
     for batch, (X, y) in enumerate(dataloader):
@@ -54,7 +55,8 @@ def train(dataloader, model, loss_fn, optimizer):
 def test(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
-    model.cuda()
+    if torch.cuda.is_available():
+        model = model.cuda()
     test_loss, correct = 0, 0
     with torch.no_grad():
         for X, y in dataloader:
@@ -86,6 +88,7 @@ test_data = datasets.FashionMNIST(
 with open("out.txt", "w") as f:
 
     start_time = time.time()
+    torch.backends.cudnn.benchmark = True
 
     batch_size = 128
 
@@ -93,9 +96,13 @@ with open("out.txt", "w") as f:
     print(f"Batch Size: {batch_size} ")
     f.write(f"Batch Size: {batch_size}")
 
-    train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
+    train_dataloader = DataLoader(
+        training_data, pin_memory=True, batch_size=batch_size, shuffle=True
+    )
     # Create data loaders.
-    test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
+    test_dataloader = DataLoader(
+        test_data, pin_memory=True, batch_size=batch_size, shuffle=True
+    )
 
     # breakpoint()
 
