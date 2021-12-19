@@ -85,7 +85,6 @@ test_data = datasets.FashionMNIST(
 
 with open("out.txt", "w") as f:
 
-<<<<<<< HEAD
     start_time = time.time()
 
     batch_size = 128
@@ -132,49 +131,6 @@ with open("out.txt", "w") as f:
     time_str = f"Time taken: {time.time() - start_time} \n"
     print(time_str)
     f.write(time_str)
-=======
-    for batch_size in range(2, 10):
-
-        start_time = time.time()
-
-        # Output batch size
-        print(f"Batch Size: {batch_size} ")
-        f.write(f"Batch Size: {batch_size}")
-
-        train_dataloader = DataLoader(training_data, batch_size=batch_size)
-        # Create data loaders.
-        test_dataloader = DataLoader(test_data, batch_size=batch_size)
-
-        # Display info about the shape of the data loaders
-        # for X, y in test_dataloader:
-        #     print("Shape of X [N, C, H, W]: ", X.shape)
-        #     print("Shape of y: ", y.shape, y.dtype)
-        #     break
-
-        # Print model
-        model = NeuralNetwork().to(device)
-        # print(model)
-
-        # Define loss function and optimizer
-        loss_fn = nn.CrossEntropyLoss()
-        optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
-
-        # Run model for 25 epochs
-        epochs = 3
-        for t in range(epochs):
-            # print(f"Epoch {t+1}\n-------------------------------")
-            train(train_dataloader, model, loss_fn, optimizer)
-            correct, test_loss = test(test_dataloader, model, loss_fn)
-
-            if t == epochs - 1:
-                print_str = f"Test Error - [Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}] "
-                print(print_str)
-                f.write(print_str)
-
-        time_str = f"Time taken: {time.time() - start_time} \n"
-        print(time_str)
-        f.write(time_str)
->>>>>>> 6b291ecb261f226702bb78a2f919c2ed2858383e
 
 
 print("Done!")
