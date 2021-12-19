@@ -1,1 +1,1 @@
-Batch Size: 128Test Error - [Accuracy: 63.8%, Avg loss: 1.720861] Time taken: 22.381786823272705 
+Batch Size: 128Test Error - [Accuracy: 59.2%, Avg loss: 1.957286] Time taken: 12.123657941818237 
