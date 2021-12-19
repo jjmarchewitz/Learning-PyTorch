@@ -1,0 +1,6 @@
+Batch Size: 16
+Epochs: 10
+LR: 0.0001
+Test Error - [Accuracy: 91.7%, Avg loss: 0.288671]
+Time taken: 00 hours, 01 minutes, and 49 sec 
+

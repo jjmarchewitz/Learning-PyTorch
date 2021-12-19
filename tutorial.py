@@ -11,9 +11,10 @@ print(f"Using {device} device")
 
 # Model parameters for tweaking
 batch_size = 16
-epochs = 1000
+epochs = 10
 internal_layer_size = 28 * 28
 learning_rate = 0.0001
+momentum = 0.9
 
 # Define model
 class NeuralNetwork(nn.Module):
@@ -125,7 +126,7 @@ with open("out.txt", "w") as f:
 
     # Define loss function and optimizer
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
 
     # Run model
     for t in range(epochs):
