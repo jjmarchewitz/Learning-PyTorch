@@ -11,10 +11,10 @@ print(f"Using {device} device")
 
 # Model parameters for tweaking
 batch_size = 16
-epochs = 10
+epochs = 1000
 internal_layer_size = 28 * 28
 learning_rate = 0.0001
-momentum = 0.9
+momentum = 0.5
 
 # Define model
 class NeuralNetwork(nn.Module):
@@ -23,6 +23,8 @@ class NeuralNetwork(nn.Module):
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(28 * 28, internal_layer_size),
+            nn.ReLU(),
+            nn.Linear(internal_layer_size, internal_layer_size),
             nn.ReLU(),
             nn.Linear(internal_layer_size, internal_layer_size),
             nn.ReLU(),
@@ -97,9 +99,11 @@ with open("out.txt", "w") as f:
     torch.backends.cudnn.benchmark = True
 
     # Output model tweaking parameters
-    param_str = f"Batch Size: {batch_size}\nEpochs: {epochs}\nLR: {learning_rate}\n"
+    param_str = (
+        f"Batch Size: {batch_size}\nEpochs: {epochs}\nLR: {learning_rate}\n"
+        f"Momentum: {momentum}\n"
+    )
     print(param_str)
-    f.write(param_str)
 
     # I am pretty sure pinned memory somehow refers to storing on the GPU when True
     pinned_memory = True if device == "cuda" else False
@@ -122,7 +126,7 @@ with open("out.txt", "w") as f:
     model = NeuralNetwork().to(device)
     if device == "cuda":
         model = model.cuda()
-    print(model)
+    print(model, "\n")
 
     # Define loss function and optimizer
     loss_fn = nn.CrossEntropyLoss()
@@ -136,22 +140,27 @@ with open("out.txt", "w") as f:
         correct, test_loss = test(test_dataloader, model, loss_fn)
 
         if t == epochs - 1:
-            print_str = (
-                f"Test Error - [Accuracy: {(100*correct):>0.1f}%, "
-                f"Avg loss: {test_loss:>8f}]"
-            )
-            print(print_str)
-            f.write(print_str + "\n")
+            final_correct_value = correct
+            final_test_loss = test_loss
 
-    # Print out statistics at the end of the run of the model
-    epoch_str = f"Epochs: {epochs}\n"
+    # Print out summary of the run at the end
+    error_and_loss_str = (
+        f"Test Error - [Accuracy: {(100*correct):>0.1f}%, "
+        f"Avg loss: {test_loss:>8f}]\n"
+    ) 
+
     runtime_str = time.strftime(
         "%H hours, %M minutes, and %S", time.gmtime(time.time() - start_time)
     )
     runtime_str = f"Time taken: {runtime_str} sec \n"
 
-    print(epoch_str + runtime_str)
-    f.write(runtime_str + "\n")
+    summary_str = param_str + error_and_loss_str + runtime_str
 
+    print(f"\nSummary\n-------------------------------")
+    print(summary_str)
+    f.write(summary_str + "\n")
+
+    # Save the trained model to a file
+    torch.save(model, "model.pt")
 
 print("Done!")
