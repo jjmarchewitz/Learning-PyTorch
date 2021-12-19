@@ -14,7 +14,7 @@ class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
         self.flatten = nn.Flatten()
-        internal_layer_size = 4096
+        internal_layer_size = 2048
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(28 * 28, internal_layer_size),
             nn.ReLU(),
@@ -74,18 +74,12 @@ def test(dataloader, model, loss_fn):
 
 # Download training data from open datasets.
 training_data = datasets.FashionMNIST(
-    root="data",
-    train=True,
-    download=True,
-    transform=ToTensor(),
+    root="data", train=True, download=True, transform=ToTensor(),
 )
 
 # Download test data from open datasets.
 test_data = datasets.FashionMNIST(
-    root="data",
-    train=False,
-    download=True,
-    transform=ToTensor(),
+    root="data", train=False, download=True, transform=ToTensor(),
 )
 
 # breakpoint()
@@ -96,11 +90,11 @@ with open("out.txt", "w") as f:
     start_time = time.time()
     torch.backends.cudnn.benchmark = True
 
-    batch_size = 128
+    batch_size = 16
 
     # Output batch size
     print(f"Batch Size: {batch_size} ")
-    f.write(f"Batch Size: {batch_size}")
+    f.write(f"Batch Size: {batch_size}\n")
 
     train_dataloader = DataLoader(
         training_data, pin_memory=True, batch_size=batch_size, shuffle=True
@@ -120,30 +114,31 @@ with open("out.txt", "w") as f:
 
     # Print model
     model = NeuralNetwork().to(device)
-    # model = model.cuda()
+    if torch.cuda.is_available():
+        model = model.cuda()
     print(model)
 
     # Define loss function and optimizer
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 
-    # Run model for 25 epochs
-    epochs = 3
+    # Run model
+    epochs = 100
 
     for t in range(epochs):
 
-        # print(f"Epoch {t+1}\n-------------------------------")
+        print(f"Epoch {t+1}\n-------------------------------")
         train(train_dataloader, model, loss_fn, optimizer)
         correct, test_loss = test(test_dataloader, model, loss_fn)
 
         if t == epochs - 1:
             print_str = f"Test Error - [Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}] "
             print(print_str)
-            f.write(print_str)
+            f.write(print_str + "\n")
 
-    time_str = f"Time taken: {time.time() - start_time} \n"
+    time_str = f"Epochs: {epochs}\nTime taken: {time.time() - start_time} sec \n"
     print(time_str)
-    f.write(time_str)
+    f.write(time_str + "\n")
 
 
 print("Done!")

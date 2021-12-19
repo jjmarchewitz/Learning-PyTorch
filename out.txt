@@ -1,5 +1,5 @@
-<<<<<<< HEAD
-Batch Size: 128Test Error - [Accuracy: 59.4%, Avg loss: 2.021972] Time taken: 23.500028133392334 
-=======
-Batch Size: 128Test Error - [Accuracy: 59.2%, Avg loss: 1.957286] Time taken: 12.123657941818237 
->>>>>>> 8048381ef9de6aa25055ebc164637023dbbf0075
+Batch Size: 16
+Test Error - [Accuracy: 88.0%, Avg loss: 0.336985] 
+Epochs: 100
+Time taken: 1064.2856249809265 sec 
+
