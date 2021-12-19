@@ -6,15 +6,20 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda, Compose
 
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
+device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
+
+# Model parameters for tweaking
+batch_size = 16
+epochs = 1000
+internal_layer_size = 28 * 28
+learning_rate = 0.0001
 
 # Define model
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
         self.flatten = nn.Flatten()
-        internal_layer_size = 2048
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(28 * 28, internal_layer_size),
             nn.ReLU(),
@@ -30,10 +35,10 @@ class NeuralNetwork(nn.Module):
 
 
 def train(dataloader, model, loss_fn, optimizer):
-    size = len(dataloader.dataset)
-    if torch.cuda.is_available():
+    if device == "cuda":
         model = model.cuda()
-    gap_time = time.time()
+
+    size = len(dataloader.dataset)
 
     for batch, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
@@ -53,10 +58,12 @@ def train(dataloader, model, loss_fn, optimizer):
 
 
 def test(dataloader, model, loss_fn):
+    if device == "cuda":
+        model = model.cuda()
+
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
-    if torch.cuda.is_available():
-        model = model.cuda()
+
     test_loss, correct = 0, 0
     with torch.no_grad():
         for X, y in dataloader:
@@ -73,16 +80,14 @@ def test(dataloader, model, loss_fn):
 
 
 # Download training data from open datasets.
-training_data = datasets.FashionMNIST(
+training_data = datasets.MNIST(
     root="data", train=True, download=True, transform=ToTensor(),
 )
 
 # Download test data from open datasets.
-test_data = datasets.FashionMNIST(
+test_data = datasets.MNIST(
     root="data", train=False, download=True, transform=ToTensor(),
 )
-
-# breakpoint()
 
 
 with open("out.txt", "w") as f:
@@ -90,21 +95,21 @@ with open("out.txt", "w") as f:
     start_time = time.time()
     torch.backends.cudnn.benchmark = True
 
-    batch_size = 16
+    # Output model tweaking parameters
+    param_str = f"Batch Size: {batch_size}\nEpochs: {epochs}\nLR: {learning_rate}\n"
+    print(param_str)
+    f.write(param_str)
 
-    # Output batch size
-    print(f"Batch Size: {batch_size} ")
-    f.write(f"Batch Size: {batch_size}\n")
+    # I am pretty sure pinned memory somehow refers to storing on the GPU when True
+    pinned_memory = True if device == "cuda" else False
 
-    train_dataloader = DataLoader(
-        training_data, pin_memory=True, batch_size=batch_size, shuffle=True
-    )
     # Create data loaders.
-    test_dataloader = DataLoader(
-        test_data, pin_memory=True, batch_size=batch_size, shuffle=True
+    train_dataloader = DataLoader(
+        training_data, pin_memory=pinned_memory, batch_size=batch_size, shuffle=True
     )
-
-    # breakpoint()
+    test_dataloader = DataLoader(
+        test_data, pin_memory=[pinned_memory], batch_size=batch_size, shuffle=True
+    )
 
     # Display info about the shape of the data loaders
     for X, y in test_dataloader:
@@ -114,17 +119,15 @@ with open("out.txt", "w") as f:
 
     # Print model
     model = NeuralNetwork().to(device)
-    if torch.cuda.is_available():
+    if device == "cuda":
         model = model.cuda()
     print(model)
 
     # Define loss function and optimizer
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
     # Run model
-    epochs = 100
-
     for t in range(epochs):
 
         print(f"Epoch {t+1}\n-------------------------------")
@@ -132,13 +135,22 @@ with open("out.txt", "w") as f:
         correct, test_loss = test(test_dataloader, model, loss_fn)
 
         if t == epochs - 1:
-            print_str = f"Test Error - [Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}] "
+            print_str = (
+                f"Test Error - [Accuracy: {(100*correct):>0.1f}%, "
+                f"Avg loss: {test_loss:>8f}]"
+            )
             print(print_str)
             f.write(print_str + "\n")
 
-    time_str = f"Epochs: {epochs}\nTime taken: {time.time() - start_time} sec \n"
-    print(time_str)
-    f.write(time_str + "\n")
+    # Print out statistics at the end of the run of the model
+    epoch_str = f"Epochs: {epochs}\n"
+    runtime_str = time.strftime(
+        "%H hours, %M minutes, and %S", time.gmtime(time.time() - start_time)
+    )
+    runtime_str = f"Time taken: {runtime_str} sec \n"
+
+    print(epoch_str + runtime_str)
+    f.write(runtime_str + "\n")
 
 
 print("Done!")

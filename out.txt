@@ -1,5 +1,0 @@
-Batch Size: 16
-Test Error - [Accuracy: 88.0%, Avg loss: 0.336985] 
-Epochs: 100
-Time taken: 1064.2856249809265 sec 
-
