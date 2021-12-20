@@ -10,21 +10,23 @@ from torchvision.transforms import ToTensor, Lambda, Compose
 
 # Define model
 class NeuralNetwork(nn.Module):
-    def __init__(self, internal_layer_size):
+    def __init__(self):
         super(NeuralNetwork, self).__init__()
+
+        self.internal_layer_size = 28 * 28
+
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(28 * 28, internal_layer_size),
+            nn.Linear(28 * 28, self.internal_layer_size),
             nn.ReLU(),
-            nn.Linear(internal_layer_size, internal_layer_size),
+            nn.Linear(self.internal_layer_size, self.internal_layer_size),
             nn.ReLU(),
-            nn.Linear(internal_layer_size, internal_layer_size),
+            nn.Linear(self.internal_layer_size, self.internal_layer_size),
             nn.ReLU(),
-            nn.Linear(internal_layer_size, 10),
+            nn.Linear(self.internal_layer_size, 10),
         )
 
     def forward(self, x):
-        breakpoint()
 
         # x comes in as 4-dimensional array/batch of 28x28 images. If you have x[A][B][C][D]
         # then A is the image number in the batch, idk what B is but it only has 1 possible
@@ -32,6 +34,6 @@ class NeuralNetwork(nn.Module):
         x = self.flatten(x)
 
         # After flattening, x is a list of flattened images. x[A] will give you image number
-        # A in the list.
+        # A in the list
         logits = self.linear_relu_stack(x)
         return logits

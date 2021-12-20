@@ -13,9 +13,9 @@ print(f"Using {device} device")
 # Model parameters for tweaking
 batch_size = 16
 epochs = 500
-internal_layer_size = 28 * 28
 learning_rate = 0.0001
 momentum = 0.5
+# Configure internal layer size/structure inside of NeuralNetwork in nn_class.py
 
 
 def train(dataloader, model, loss_fn, optimizer):
@@ -47,6 +47,8 @@ def test(dataloader, model, loss_fn):
 
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
+
+    breakpoint()
 
     test_loss, correct = 0, 0
     with torch.no_grad():
@@ -110,7 +112,7 @@ with open("out.txt", "w") as f:
         break
 
     # Print model
-    model = NeuralNetwork(internal_layer_size).to(device)
+    model = NeuralNetwork().to(device)
     if device == "cuda":
         model = model.cuda()
     print(model, "\n")
@@ -148,6 +150,6 @@ with open("out.txt", "w") as f:
     f.write(summary_str + "\n")
 
     # Save the trained model to a file
-    torch.save(model, "model.pt")
+    torch.save(model.state_dict(), "model.pt")
 
 print("Done!")
