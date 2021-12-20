@@ -11,7 +11,7 @@ print(f"Using {device} device")
 
 # Model parameters for tweaking
 batch_size = 16
-epochs = 1000
+epochs = 500
 internal_layer_size = 28 * 28
 learning_rate = 0.0001
 momentum = 0.5
