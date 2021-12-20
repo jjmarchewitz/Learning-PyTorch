@@ -48,8 +48,6 @@ def test(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
 
-    breakpoint()
-
     test_loss, correct = 0, 0
     with torch.no_grad():
         for X, y in dataloader:
