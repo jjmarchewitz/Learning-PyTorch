@@ -5,6 +5,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda, Compose
+from src.nn_class import NeuralNetwork
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -15,26 +16,6 @@ epochs = 500
 internal_layer_size = 28 * 28
 learning_rate = 0.0001
 momentum = 0.5
-
-# Define model
-class NeuralNetwork(nn.Module):
-    def __init__(self):
-        super(NeuralNetwork, self).__init__()
-        self.flatten = nn.Flatten()
-        self.linear_relu_stack = nn.Sequential(
-            nn.Linear(28 * 28, internal_layer_size),
-            nn.ReLU(),
-            nn.Linear(internal_layer_size, internal_layer_size),
-            nn.ReLU(),
-            nn.Linear(internal_layer_size, internal_layer_size),
-            nn.ReLU(),
-            nn.Linear(internal_layer_size, 10),
-        )
-
-    def forward(self, x):
-        x = self.flatten(x)
-        logits = self.linear_relu_stack(x)
-        return logits
 
 
 def train(dataloader, model, loss_fn, optimizer):
@@ -84,12 +65,18 @@ def test(dataloader, model, loss_fn):
 
 # Download training data from open datasets.
 training_data = datasets.MNIST(
-    root="data", train=True, download=True, transform=ToTensor(),
+    root="data",
+    train=True,
+    download=True,
+    transform=ToTensor(),
 )
 
 # Download test data from open datasets.
 test_data = datasets.MNIST(
-    root="data", train=False, download=True, transform=ToTensor(),
+    root="data",
+    train=False,
+    download=True,
+    transform=ToTensor(),
 )
 
 
@@ -123,7 +110,7 @@ with open("out.txt", "w") as f:
         break
 
     # Print model
-    model = NeuralNetwork().to(device)
+    model = NeuralNetwork(internal_layer_size).to(device)
     if device == "cuda":
         model = model.cuda()
     print(model, "\n")
@@ -147,7 +134,7 @@ with open("out.txt", "w") as f:
     error_and_loss_str = (
         f"Test Error - [Accuracy: {(100*correct):>0.1f}%, "
         f"Avg loss: {test_loss:>8f}]\n"
-    ) 
+    )
 
     runtime_str = time.strftime(
         "%H hours, %M minutes, and %S", time.gmtime(time.time() - start_time)
