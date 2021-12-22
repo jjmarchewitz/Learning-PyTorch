@@ -23,7 +23,7 @@ model = NeuralNetwork().to(device)
 @dataclass
 class WindowProperties:
     width: int = 600
-    height: int = 600
+    height: int = 700
 
     # A "pixel block" is a word that I made up to refer to a group of pixels on screen that
     # represent one greyscale pixel in an image in the MNIST dataset. So there would be a
@@ -129,7 +129,7 @@ while not done:
     current_digit.draw(
         display_surface,
         20,
-        0,
+        20,
         window_properties.pixel_block_columns * window_properties.pixel_block_scalar,
         window_properties.pixel_block_rows * window_properties.pixel_block_scalar,
     )
