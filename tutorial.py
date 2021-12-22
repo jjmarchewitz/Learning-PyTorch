@@ -1,5 +1,7 @@
+from numpy import tan, tanh
 import torch
 from torch import nn
+from torch.nn.modules.activation import Tanh
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda, Compose
@@ -74,6 +76,32 @@ class Discriminator(nn.Module):
 
     def forward(self, x):
         return self.Disc(x)
+
+
+
+class Generator(nn.Module):
+    def __init__(self, z_dim, img_dim):
+        super().__init__()
+        self.Gen = nn.Sequential(
+            nn.Linear(z_dim, 64),
+            nn.LeakyReLU(0.2),
+            nn.Linear(64, 128),
+            nn.LeakyReLU(0.2),
+            nn.Linear(128, 256),
+            nn.LeakyReLU(0.2),
+            nn.Linear(256, img_dim),
+            nn.Tanh()
+
+        )
+
+    def forward(self, x):
+        return self.Gen(x)
+
+
+
+
+
+
 
 
 
