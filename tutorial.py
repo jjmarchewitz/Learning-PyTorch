@@ -54,6 +54,32 @@ class NeuralNetwork(nn.Module):
         return logits
 
 
+
+#define GAN
+
+class Discriminator(nn.Module):
+    def __init__(self, img_dim):
+        super().__init__()
+        self.Disc = nn.Sequential(
+            nn.Linear(img_dim, 256),
+            nn.LeakyReLU(0.2),
+            nn.Linear(256, 128),
+            nn.LeakyReLU(0.2),
+            nn.Linear(128, 64),
+            nn.LeakyReLU(),
+            nn.Linear(64, 1),
+            nn.Sigmoid()
+        )
+
+
+    def forward(self, x):
+        return self.Disc(x)
+
+
+
+
+
+
 model = NeuralNetwork().to(device)
 print(model)
 
