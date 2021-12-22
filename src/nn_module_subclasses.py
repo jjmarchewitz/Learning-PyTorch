@@ -8,7 +8,7 @@ from torchvision.transforms import ToTensor, Lambda, Compose
 # to use this class. Good OOP design and all that
 
 
-# Define model
+# Define Linear NN
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
@@ -37,3 +37,40 @@ class NeuralNetwork(nn.Module):
         # A in the list
         logits = self.linear_relu_stack(x)
         return logits
+
+
+# define GAN
+class Discriminator(nn.Module):
+    def __init__(self, img_dim):
+        super().__init__()
+        self.Disc = nn.Sequential(
+            nn.Linear(img_dim, 256),
+            nn.LeakyReLU(0.2),
+            nn.Linear(256, 128),
+            nn.LeakyReLU(0.2),
+            nn.Linear(128, 64),
+            nn.LeakyReLU(),
+            nn.Linear(64, 1),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        return self.Disc(x)
+
+
+class Generator(nn.Module):
+    def __init__(self, z_dim, img_dim):
+        super().__init__()
+        self.Gen = nn.Sequential(
+            nn.Linear(z_dim, 64),
+            nn.LeakyReLU(0.2),
+            nn.Linear(64, 128),
+            nn.LeakyReLU(0.2),
+            nn.Linear(128, 256),
+            nn.LeakyReLU(0.2),
+            nn.Linear(256, img_dim),
+            nn.Tanh(),
+        )
+
+    def forward(self, x):
+        return self.Gen(x)

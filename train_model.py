@@ -5,7 +5,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda, Compose
-from src.nn_class import NeuralNetwork
+from src.nn_module_subclasses import NeuralNetwork
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
