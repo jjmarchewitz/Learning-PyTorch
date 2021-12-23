@@ -1,12 +1,17 @@
 from numpy import tan, tanh
 import torch
 from torch import nn
+from torch._C import _get_custom_class_python_wrapper
 from torch.nn.modules.activation import Tanh
-from torch.utils.data import DataLoader
+from torch.utils import data
+from torch.utils.data import DataLoader, dataloader
 from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda, Compose
 import matplotlib.pyplot as plt
 from src.nn_module_subclasses import NeuralNetwork
+from src.nn_module_subclasses import Discriminator
+from src.nn_module_subclasses import Generator 
+from torch.optim import optim 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -84,9 +89,81 @@ def test(dataloader, model, loss_fn):
     )
 
 
+
+
+
+
 epochs = 10
-for t in range(epochs):
-    print(f"Epoch {t+1}\n-------------------------------")
-    train(train_dataloader, model, loss_fn, optimizer)
-    test(test_dataloader, model, loss_fn)
-print("Done!")
+img_dim = 28*28*1
+z_dim = 32
+disc = Discriminator(img_dim=img_dim)
+gen = Generator(z_dim=z_dim, img_dim=img_dim)
+criterion = nn.BCELoss()
+disc_optim = optim.Adam(disc.parameters(), lr=1e-5)
+gen_optim = optim.Adam(gen.parameters(), lr=1e-5)
+
+
+def train_gan(dataloader, generator, discriminator, loss_fn, generator_optimizer, discriminator_optimizer, epochs, z_dim):
+    for epoch in epochs:
+        for batch_idx, sample in enumerate(dataloader):
+            real = sample.view(-1, 28*28*1).to(device)
+            batch_size = real.shape[0]
+
+            #generate random noise
+            z = torch.randn(batch_size, z_dim)
+
+            #generate fake image
+            fake = generator(z)
+
+            #discriminator real image loss
+            disc_real = discriminator(real).view(-1)
+            disc_real_loss = loss_fn(disc_real, torch.ones_like(disc_real))
+
+            #discriminator fake image loss
+            disc_fake = discriminator(fake).view(-1)
+            disc_fake_loss = loss_fn(disc_fake, torch.zeros_like(disc_fake))
+
+            total_loss = (disc_real_loss + disc_fake_loss)/2
+
+            discriminator.zero_grad()
+            total_loss.backward(retain_graph=True)
+            discriminator_optimizer.step()
+
+            #generator loss
+            gen_output = discriminator(fake).view(-1)
+            gen_loss = loss_fn(gen_output, torch.ones_like(gen_output))
+
+            generator.zero_grad()
+            gen_loss.backward(retain_graph=True)
+            generator_optimizer.step()
+
+            if batch_idx == 0:
+                print(
+                    f'Epoch: {epoch}/{epochs}, \
+                    Loss Discriminator: {total_loss:.4f},\
+                 Loss Generator: {gen_loss:.4f}'
+                )
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+train_gan(train_dataloader, gen,disc, criterion, gen_optim, disc_optim, 10, z_dim)
+
+
+#or t in range(epochs):
+   # print(f"Epoch {t+1}\n-------------------------------")
+   # train(train_dataloader, model, loss_fn, optimizer)
+   # test(test_dataloader, model, loss_fn)
+#print("Done!")
