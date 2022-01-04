@@ -1,2 +1,11 @@
+# Custom for this project
 out.txt
+
+# Python
+*/__pycache__
+
+# VS Code
 *.code-workspace
+
+# macOS
+*.DS_Store

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
 import pygame as pg
+from pygame import mouse
 from src.nn_module_subclasses import NeuralNetwork
 import torch
 from torch import nn
@@ -67,27 +68,24 @@ class PixelBlock:
 
 
 class DigitImage:
-    def __init__(self, pixel_width, pixel_height, scalar):
+    def __init__(self, window_properties):
 
-        # This is called a "list comprehension". It allows you to define lists (or in this
-        # case nested lists) using in-line for-loops. Here's a simple example:
-        # list_a = [i for i in range(5)]   -->  [0, 1, 2, 3, 4]
-        self.pixel_array = [
-            [
-                PixelBlock(
-                    i * scalar,
-                    j * scalar,
-                    scalar,
-                    scalar,
-                    (0, 0, 0),  # cool visual --> (i + j * 5, i + j * 5, i + j * 5),
-                )
-                for i in range(pixel_width)
-            ]
-            for j in range(pixel_height)
-        ]
+        self.window_properties = window_properties
 
-    def draw(self, display_surface, left, top, width, height):
+        self.clear()
+
+    def draw(self, display_surface, left, top):
         # The extra parenthesis are on purpose, Surface() takes a tuple as input
+
+        width = (
+            window_properties.pixel_block_columns
+            * self.window_properties.pixel_block_scalar
+        )
+        height = (
+            window_properties.pixel_block_rows
+            * self.window_properties.pixel_block_scalar
+        )
+
         digit_surface = pg.Surface((width, height))
 
         for x in self.pixel_array:
@@ -95,6 +93,45 @@ class DigitImage:
                 digit_surface.blit(y.pixel_surface, y.top_left)
 
         display_surface.blit(digit_surface, [left, top])
+
+    def clear(self):
+        # This is called a "list comprehension". It allows you to define lists (or in this
+        # case nested lists) using in-line for-loops. Here's a simple example:
+        # list_a = [i for i in range(5)]  -->  [0, 1, 2, 3, 4]
+        self.pixel_array = [
+            [
+                PixelBlock(
+                    i * self.window_properties.pixel_block_scalar,
+                    j * self.window_properties.pixel_block_scalar,
+                    self.window_properties.pixel_block_scalar,
+                    self.window_properties.pixel_block_scalar,
+                    (0, 0, 0),  # cool visual --> (i + j * 5, i + j * 5, i + j * 5),
+                )
+                for i in range(self.window_properties.pixel_block_columns)
+            ]
+            for j in range(self.window_properties.pixel_block_rows)
+        ]
+
+    def update_pixel_block_array(self, brush_size):
+
+        # Dims: 560, 560
+        start_x, end_x = 20, 580
+        start_y, end_y = 20, 580
+
+        mouse_x, mouse_y = pg.mouse.get_pos()
+
+        # Check that the mouse is within the boundaries of the digit drawing area
+        if mouse_x in range(start_x, end_x + 1) and mouse_y in range(
+            start_y, end_y + 1
+        ):
+            pixel_block_x = int(
+                (mouse_x - start_x) / self.window_properties.pixel_block_scalar
+            )
+            pixel_block_y = int(
+                (mouse_y - start_y) / self.window_properties.pixel_block_scalar
+            )
+
+            self.pixel_array[pixel_block_y][pixel_block_x].update_color((255, 255, 255))
 
 
 pg.init()
@@ -107,11 +144,7 @@ display_surface = pg.display.set_mode(
 )
 
 # Initialize the image array class
-current_digit = DigitImage(
-    window_properties.pixel_block_columns,
-    window_properties.pixel_block_rows,
-    window_properties.pixel_block_scalar,
-)
+current_digit = DigitImage(window_properties)
 
 # print(current_drawing.pixel_array)
 
@@ -123,16 +156,14 @@ while not done:
         if event.type == pg.QUIT:
             done = True
 
+    # If the mouse is pressed
+    if pg.mouse.get_pressed()[0]:
+        current_digit.update_pixel_block_array(10)
+
     # Fill the background of the window in
     display_surface.fill(window_properties.scarlet)
 
-    current_digit.draw(
-        display_surface,
-        20,
-        20,
-        window_properties.pixel_block_columns * window_properties.pixel_block_scalar,
-        window_properties.pixel_block_rows * window_properties.pixel_block_scalar,
-    )
+    current_digit.draw(display_surface, 20, 20)
 
     pg.display.flip()
 
