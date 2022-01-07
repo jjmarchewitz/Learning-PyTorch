@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from src.nn_module_subclasses import NeuralNetwork
 from src.nn_module_subclasses import Discriminator
 from src.nn_module_subclasses import Generator 
-from torch.optim import optim 
+import torch.optim as optim 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -104,9 +104,9 @@ gen_optim = optim.Adam(gen.parameters(), lr=1e-5)
 
 
 def train_gan(dataloader, generator, discriminator, loss_fn, generator_optimizer, discriminator_optimizer, epochs, z_dim):
-    for epoch in epochs:
-        for batch_idx, sample in enumerate(dataloader):
-            real = sample.view(-1, 28*28*1).to(device)
+    for epoch in range(epochs):
+        for batch_idx, (real, _) in enumerate(dataloader):
+            real = real.view(-1, 28*28*1).to(device)
             batch_size = real.shape[0]
 
             #generate random noise
@@ -136,6 +136,7 @@ def train_gan(dataloader, generator, discriminator, loss_fn, generator_optimizer
             generator.zero_grad()
             gen_loss.backward(retain_graph=True)
             generator_optimizer.step()
+            print(gen_output)
 
             if batch_idx == 0:
                 print(
@@ -159,7 +160,7 @@ def train_gan(dataloader, generator, discriminator, loss_fn, generator_optimizer
 
 
 
-train_gan(train_dataloader, gen,disc, criterion, gen_optim, disc_optim, 10, z_dim)
+train_gan(train_dataloader, gen,disc, criterion, gen_optim, disc_optim, 2, z_dim)
 
 
 #or t in range(epochs):
