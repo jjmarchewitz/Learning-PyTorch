@@ -15,7 +15,6 @@ print(f"Using {device} device")
 
 model = NeuralNetwork().to(device)
 # Load trained model from models folder
-
 # TODO: Fix this
 # state_dict = torch.load("models/98_percent_model.pt", map_location=torch.device(device))
 # model.load_state_dict(state_dict)
@@ -145,7 +144,6 @@ display_surface = pg.display.set_mode(
 
 # Initialize the image array class
 current_digit = DigitImage(window_properties)
-
 # print(current_drawing.pixel_array)
 
 while not done:
