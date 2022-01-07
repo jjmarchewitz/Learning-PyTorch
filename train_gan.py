@@ -89,12 +89,8 @@ def test(dataloader, model, loss_fn):
     )
 
 
-
-
-
-
 epochs = 10
-img_dim = 28*28*1
+img_dim = 28 * 28 * 1
 z_dim = 32
 disc = Discriminator(img_dim=img_dim)
 gen = Generator(z_dim=z_dim, img_dim=img_dim)
@@ -109,27 +105,27 @@ def train_gan(dataloader, generator, discriminator, loss_fn, generator_optimizer
             real = real.view(-1, 28*28*1).to(device)
             batch_size = real.shape[0]
 
-            #generate random noise
+            # generate random noise
             z = torch.randn(batch_size, z_dim)
 
-            #generate fake image
+            # generate fake image
             fake = generator(z)
 
-            #discriminator real image loss
+            # discriminator real image loss
             disc_real = discriminator(real).view(-1)
             disc_real_loss = loss_fn(disc_real, torch.ones_like(disc_real))
 
-            #discriminator fake image loss
+            # discriminator fake image loss
             disc_fake = discriminator(fake).view(-1)
             disc_fake_loss = loss_fn(disc_fake, torch.zeros_like(disc_fake))
 
-            total_loss = (disc_real_loss + disc_fake_loss)/2
+            total_loss = (disc_real_loss + disc_fake_loss) / 2
 
             discriminator.zero_grad()
             total_loss.backward(retain_graph=True)
             discriminator_optimizer.step()
 
-            #generator loss
+            # generator loss
             gen_output = discriminator(fake).view(-1)
             gen_loss = loss_fn(gen_output, torch.ones_like(gen_output))
 
@@ -140,12 +136,13 @@ def train_gan(dataloader, generator, discriminator, loss_fn, generator_optimizer
 
             if batch_idx == 0:
                 print(
-                    f'Epoch: {epoch}/{epochs}, \
+                    f"Epoch: {epoch}/{epochs}, \
                     Loss Discriminator: {total_loss:.4f},\
-                 Loss Generator: {gen_loss:.4f}'
+                 Loss Generator: {gen_loss:.4f}"
                 )
 
 
+train_gan(train_dataloader, gen, disc, criterion, gen_optim, disc_optim, 10, z_dim)
 
 
 
